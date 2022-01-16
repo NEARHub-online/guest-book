@@ -12,8 +12,8 @@ beforeAll(async function() {
   near = await nearlib.connect(nearConfig);
   accountId = nearConfig.contractName;
   contract = await near.loadContract(nearConfig.contractName, {
-    viewMethods: ['getMessages'],
-    changeMethods: ['addMessage'],
+    viewMethods: ['getMessages', 'getMessagesId'],
+    changeMethods: ['addMessage', 'addMessageId'],
     sender: accountId
   });
 });

@@ -14,7 +14,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
-    contract.getMessages().then(setMessages);
+    contract.getMessagesId({  id: "Test" }).then(setMessages);
   }, []);
 
   const onSubmit = (e) => {
@@ -27,12 +27,13 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     // TODO: optimistically update page with new message,
     // update blockchain data in background
     // add uuid to each message, so we know which one is already known
-    contract.addMessage(
-      { text: message.value },
+    contract.addMessageId(
+      { text: message.value,
+        id: "Test" },
       BOATLOAD_OF_GAS,
       Big(donation.value || '0').times(10 ** 24).toFixed()
     ).then(() => {
-      contract.getMessages().then(messages => {
+      contract.getMessagesId({  id: "Test" }).then(messages => {
         setMessages(messages);
         message.value = '';
         donation.value = SUGGESTED_DONATION;
@@ -44,7 +45,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
 
   const signIn = () => {
     wallet.requestSignIn(
-      {contractId: nearConfig.contractName, methodNames: [contract.addMessage.name]}, //contract requesting access
+      {contractId: nearConfig.contractName, methodNames: [contract.addMessageId.name]}, //contract requesting access
       'NEAR Guest Book', //optional name
       null, //optional URL to redirect to if the sign in was successful
       null //optional URL to redirect to if the sign in was NOT successful
@@ -77,7 +78,9 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
 App.propTypes = {
   contract: PropTypes.shape({
     addMessage: PropTypes.func.isRequired,
-    getMessages: PropTypes.func.isRequired
+    getMessages: PropTypes.func.isRequired,
+    addMessageId: PropTypes.func.isRequired,
+    getMessagesId: PropTypes.func.isRequired
   }).isRequired,
   currentUser: PropTypes.shape({
     accountId: PropTypes.string.isRequired,

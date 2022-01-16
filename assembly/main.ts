@@ -20,8 +20,8 @@ export function addMessage(text: string): void {
 
 export function addMessageId(text: string, id: string): void {
   const message = new PostedMessage(text);
-  let idMessages = comments.getSome(id);
-  if(idMessages){
+  const idMessages = comments.get(id);
+  if(idMessages != null){
     idMessages.push(message);
   }
   else{
@@ -48,7 +48,11 @@ export function getMessages(): PostedMessage[] {
 
 export function getMessagesId(id: string): PostedMessage[] {
   // get message for id
-  let idMessages = comments.getSome(id);
+  let idMessages = comments.get(id);
+
+  if(idMessages == null){
+    return new Array<PostedMessage>(0);
+  }
 
   const numMessages = min(MESSAGE_LIMIT, idMessages.length);
   const startIndex = idMessages.length - numMessages;
