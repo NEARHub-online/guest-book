@@ -1,4 +1,5 @@
-import { PostedMessage, messages } from './model';
+import { PostedMessage, messages, comments } from './model';
+import { PersistentVector } from "near-sdk-as";
 
 // --- contract code goes below
 
@@ -17,6 +18,20 @@ export function addMessage(text: string): void {
   messages.push(message);
 }
 
+export function addMessageId(text: string, id: string): void {
+  const message = new PostedMessage(text);
+  let idMessages = comments.getSome(id);
+  if(idMessages){
+    idMessages.push(message);
+  }
+  else{
+    const newMessages = new PersistentVector<PostedMessage>(id);
+    newMessages.push(message);
+    comments.set(id, newMessages);
+  }
+
+}
+
 /**
  * Returns an array of last N messages.\
  * NOTE: This is a view method. Which means it should NOT modify the state.
@@ -30,3 +45,16 @@ export function getMessages(): PostedMessage[] {
   }
   return result;
 }
+
+export function getMessagesId(id: string): PostedMessage[] {
+  // get message for id
+  let idMessages = comments.getSome(id);
+
+  const numMessages = min(MESSAGE_LIMIT, idMessages.length);
+  const startIndex = idMessages.length - numMessages;
+  const result = new Array<PostedMessage>(numMessages);
+  for(let i = 0; i < numMessages; i++) {
+    result[i] = idMessages[i + startIndex];
+  }
+  return result;
+} 
