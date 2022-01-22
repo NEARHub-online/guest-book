@@ -7,6 +7,7 @@ import { context, u128, PersistentVector, PersistentMap } from "near-sdk-as";
 export class PostedMessage {
   premium: boolean;
   sender: string;
+  banned: boolean;
   constructor(public text: string) {
     this.premium = context.attachedDeposit >= u128.from('10000000000000000000000');
     this.sender = context.sender;

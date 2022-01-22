@@ -1,5 +1,5 @@
 import { PostedMessage, messages, comments } from './model';
-import { PersistentVector } from "near-sdk-as";
+import { context, PersistentVector } from "near-sdk-as";
 
 // --- contract code goes below
 
@@ -62,3 +62,22 @@ export function getMessagesId(id: string): PostedMessage[] {
   }
   return result;
 } 
+
+export function banComment(id: string, text: string): bool{
+  assert(context.predecessor == context.contractName, "Only the contractowner can ban a comment");
+
+  let idMessages = comments.get(id);
+
+  if(idMessages == null){
+    return false;
+  }
+
+  for(let i = 0; i < idMessages.length; i++) {
+    if (idMessages[i].text == text){
+      idMessages[i].banned = true;
+      return true;
+    }
+  }
+
+  return false;
+}
