@@ -1,5 +1,5 @@
-import { addMessage, getMessages } from '../main';
-import { PostedMessage, messages } from '../model';
+import { addMessageId, getMessagesId } from '../main';
+import { PostedMessage, comments } from '../model';
 import { VMContext, Context, u128 } from 'near-sdk-as';
 
 function createMessage(text: string): PostedMessage {
@@ -10,18 +10,17 @@ const message = createMessage('hello world');
 
 describe('message tests', () => {
   afterEach(() => {
-    while(messages.length > 0) {
-      messages.pop();
-    }
+    comments.delete('test');
   });
 
   it('adds a message', () => {
-    addMessage('hello world');
-    expect(messages.length).toBe(
+    addMessageId('hello world', 'test');
+    const messagesId = getMessagesId('test');
+    expect(messagesId.length).toBe(
       1,
       'should only contain one message'
     );
-    expect(messages[0]).toStrictEqual(
+    expect(messagesId[0]).toStrictEqual(
       message,
       'message should be "hello world"'
     );
@@ -29,16 +28,16 @@ describe('message tests', () => {
 
   it('adds a premium message', () => {
     VMContext.setAttached_deposit(u128.from('10000000000000000000000'));
-    addMessage('hello world');
-    const messageAR = getMessages();
+    addMessageId('hello world', 'test');
+    const messageAR = getMessagesId('test');
     expect(messageAR[0].premium).toStrictEqual(true,
       'should be premium'
     );
   });
 
   it('retrieves messages', () => {
-    addMessage('hello world');
-    const messagesArr = getMessages();
+    addMessageId('hello world', 'test');
+    const messagesArr = getMessagesId('test');
     expect(messagesArr.length).toBe(
       1,
       'should be one message'
@@ -50,20 +49,21 @@ describe('message tests', () => {
   });
 
   it('only show the last 10 messages', () => {
-    addMessage('hello world');
+    addMessageId('hello world', 'test');
+    addMessageId('hello world 1', 'test');
     const newMessages: PostedMessage[] = [];
     for(let i: i32 = 0; i < 10; i++) {
       const text = 'message #' + i.toString();
+      addMessageId(text, 'test');
       newMessages.push(createMessage(text));
-      addMessage(text);
     }
-    const messages = getMessages();
-    log(messages.slice(7, 10));
-    expect(messages).toStrictEqual(
+    const messagesId = getMessagesId('test');
+    log(messagesId);
+    expect(messagesId).toStrictEqual(
       newMessages,
       'should be the last ten messages'
     );
-    expect(messages).not.toIncludeEqual(
+    expect(messagesId).not.toIncludeEqual(
       message,
       'shouldn\'t contain the first element'
     );
@@ -79,7 +79,7 @@ describe('attached deposit tests', () => {
   it('attaches a deposit to a contract call', () => {
     log('Initial account balance: ' + Context.accountBalance.toString());
 
-    addMessage('hello world');
+    addMessageId('hello world', 'test');
     VMContext.setAttached_deposit(u128.from('10'));
 
     log('Attached deposit: 10');

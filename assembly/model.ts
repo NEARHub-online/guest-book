@@ -19,5 +19,4 @@ export class PostedMessage {
  * The parameter to the constructor needs to be unique across a single contract.
  * It will be used as a prefix to all keys required to store data in the storage.
  */
-export const messages = new PersistentVector<PostedMessage>("m");
 export const comments = new PersistentMap<string, PersistentVector<PostedMessage>>("umap");

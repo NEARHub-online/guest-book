@@ -1,4 +1,4 @@
-import { PostedMessage, messages, comments } from './model';
+import { PostedMessage, comments } from './model';
 import { context, PersistentVector } from "near-sdk-as";
 
 // --- contract code goes below
@@ -6,49 +6,20 @@ import { context, PersistentVector } from "near-sdk-as";
 // The maximum number of latest messages the contract returns.
 const MESSAGE_LIMIT = 10;
 
-/**
- * Adds a new message under the name of the sender's account id.\
- * NOTE: This is a change method. Which means it will modify the state.\
- * But right now we don't distinguish them with annotations yet.
- */
-export function addMessage(text: string): void {
-  // Creating a new message and populating fields with our data
-  const message = new PostedMessage(text);
-  // Adding the message to end of the persistent collection
-  messages.push(message);
-}
-
 export function addMessageId(text: string, id: string): void {
   const message = new PostedMessage(text);
-  const idMessages = comments.get(id);
-  if(idMessages != null){
-    idMessages.push(message);
+  let idMessages = comments.get(id);
+  if(idMessages == null){
+    idMessages = new PersistentVector<PostedMessage>(id);
   }
-  else{
-    const newMessages = new PersistentVector<PostedMessage>(id);
-    newMessages.push(message);
-    comments.set(id, newMessages);
-  }
+  idMessages.push(message);
+  comments.set(id, idMessages);
 
-}
-
-/**
- * Returns an array of last N messages.\
- * NOTE: This is a view method. Which means it should NOT modify the state.
- */
-export function getMessages(): PostedMessage[] {
-  const numMessages = min(MESSAGE_LIMIT, messages.length);
-  const startIndex = messages.length - numMessages;
-  const result = new Array<PostedMessage>(numMessages);
-  for(let i = 0; i < numMessages; i++) {
-    result[i] = messages[i + startIndex];
-  }
-  return result;
 }
 
 export function getMessagesId(id: string): PostedMessage[] {
   // get message for id
-  let idMessages = comments.get(id);
+  const idMessages = comments.get(id);
 
   if(idMessages == null){
     return new Array<PostedMessage>(0);
@@ -63,7 +34,7 @@ export function getMessagesId(id: string): PostedMessage[] {
   return result;
 } 
 
-export function banComment(id: string, text: string): bool{
+export function banMessage(id: string, text: string, ban: boolean): boolean{
   assert(context.predecessor == context.contractName, "Only the contractowner can ban a comment");
 
   let idMessages = comments.get(id);
@@ -74,7 +45,10 @@ export function banComment(id: string, text: string): bool{
 
   for(let i = 0; i < idMessages.length; i++) {
     if (idMessages[i].text == text){
-      idMessages[i].banned = true;
+      let message = new PostedMessage(text);
+      message.banned = ban;
+      message.sender = idMessages[i].sender;
+      idMessages.replace(i, message);
       return true;
     }
   }
