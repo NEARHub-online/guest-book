@@ -24,6 +24,7 @@ describe('message tests', () => {
       message,
       'message should be "hello world"'
     );
+    expect(messagesId[0].created).toBeGreaterThan(0);
   });
 
   it('adds a premium message', () => {
@@ -68,6 +69,12 @@ describe('message tests', () => {
       'shouldn\'t contain the first element'
     );
   });
+});
+
+describe('invalid message length', () => {
+  throws("When message is too long", (): void => {
+    createMessage('This is a super long message and it will make the smart contract to fail!!! This is a super long message and it will make the smart contract to fail!!! This is a super long message and it will make the smart contract to fail!!! This is a super long message and it will make the smart contract to fail!!!');
+  }, "Sending messages longer than 280 should throw an error.");
 });
 
 describe('attached deposit tests', () => {

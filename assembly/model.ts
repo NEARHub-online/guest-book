@@ -1,5 +1,7 @@
 import { context, u128, PersistentVector, PersistentMap } from "near-sdk-as";
 
+const initDate = 1640995200000;
+const maxLength = 280;
 /** 
  * Exporting a new class PostedMessage so it can be used outside of this file.
  */
@@ -8,9 +10,12 @@ export class PostedMessage {
   premium: boolean;
   sender: string;
   banned: boolean;
+  created: u64;
   constructor(public text: string) {
+    assert(text.length <= maxLength);
     this.premium = context.attachedDeposit >= u128.from('10000000000000000000000');
     this.sender = context.sender;
+    this.created = context.blockTimestamp - initDate;
   }
 }
 /**
@@ -19,4 +24,4 @@ export class PostedMessage {
  * The parameter to the constructor needs to be unique across a single contract.
  * It will be used as a prefix to all keys required to store data in the storage.
  */
-export const comments = new PersistentMap<string, PersistentVector<PostedMessage>>("umap");
+export const comments = new PersistentMap<string, PersistentVector<PostedMessage>>("");

@@ -12,7 +12,8 @@
     "lint": "eslint \"./**/*.js\" \"./**/*.jsx\"",
     "start": "yarn deploy && parcel src/index.html",
     "dev:start": "env-cmd -f ./neardev/dev-account.env parcel src/index.html",
-    "test": "yarn build:contract:debug && asp && jest"
+    "test": "yarn build:contract:debug && asp && jest",
+    "test:contract": "yarn build:contract:debug && asp"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
