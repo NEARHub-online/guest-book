@@ -8,7 +8,7 @@ const MESSAGE_LIMIT = 10;
 const MAX_LENGTH = 280;
 
 export function addMessageId(text: string, id: string): void {
-  assert(text.length <= MAX_LENGTH, "Message is too long, max length is " + MAX_LENGTH);
+  assert(text.length <= MAX_LENGTH, "Message is too long, max length is " + MAX_LENGTH.toString());
   const message = new PostedMessage(text);
   let idMessages = comments.get(id);
   if(idMessages == null){
