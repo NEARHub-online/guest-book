@@ -1,6 +1,6 @@
 import { context, u128, PersistentVector, PersistentMap } from "near-sdk-as";
 
-const initDate = 1640995200000;
+const initDate = 1640995200000000000;
 const maxLength = 280;
 /** 
  * Exporting a new class PostedMessage so it can be used outside of this file.
