@@ -15,7 +15,7 @@ export class PostedMessage {
     assert(text.length <= maxLength);
     this.premium = context.attachedDeposit >= u128.from('10000000000000000000000');
     this.sender = context.sender;
-    this.created = context.blockTimestamp - initDate;
+    this.created = (context.blockTimestamp - initDate) / 10 ** 9;
   }
 }
 /**
