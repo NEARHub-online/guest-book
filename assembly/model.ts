@@ -12,7 +12,7 @@ export class PostedMessage {
   banned: boolean;
   created: u64;
   constructor(public text: string) {
-    assert(text.length <= maxLength);
+    assert(text.length <= maxLength, "Message is too long, max length is " + maxLength.toString());
     this.premium = context.attachedDeposit >= u128.from('10000000000000000000000');
     this.sender = context.sender;
     this.created = (context.blockTimestamp - initDate) / 10 ** 9;
